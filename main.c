@@ -36,7 +36,7 @@ int main() {
     socklen_t saddr_len = sizeof(saddr);
 
     while(1) {
-        int data_size = recvfrom(raw_socket, buffer, sizeof(buffer), 0, &saddr, &saddr_len);
+        int data_size = recv(raw_socket, buffer, sizeof(buffer),0);
         if(data_size < 0) {
             perror("Recvfrom error");
             close(raw_socket);
