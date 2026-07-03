@@ -12,11 +12,11 @@
 #include <sys/socket.h>
 #include <linux/if_packet.h>
 #include "create_socket.h"
+
 /**
  * @brief Restarts the raw socket connection.
  * 
  * Closes the existing socket and attempts to create a new one.
- * Includes a brief delay to prevent CPU exhaustion in case of continuous failures.
  * 
  * @param old_socket The file descriptor of the socket that failed.
  * @return int Returns the new socket file descriptor.
@@ -27,9 +27,6 @@ int restart_server(int old_socket) {
     }
     
     printf("Attempting to restart socket...\n");
-    // 1-second delay to prevent CPU exhaustion if the error persists
-    sleep(1); 
-    
     return create_raw_socket();
 }
 
@@ -37,17 +34,27 @@ int restart_server(int old_socket) {
  * @brief Main function to run the packet sniffer.
  * 
  * Initializes the raw socket and enters an infinite loop to receive packets.
- * It allocates a buffer for the maximum possible packet size and prints
- * the number of bytes received for each packet.
+ * If an error occurs, it prompts the user to either retry or exit the application.
  * 
  * @return int Returns 0 on successful termination, or 1 on error.
  */
 int main() {
     int raw_socket = create_raw_socket();
-    // If initial creation fails, attempt to recover immediately
+    char choice;
+
+    // Handle failure on initial socket creation
     while (raw_socket < 0) {
         perror("Initial socket creation failed");
-        raw_socket = restart_server(raw_socket);
+        
+        printf("Do you want to retry? (r = retry, e = exit): ");
+        scanf(" %c", &choice);
+        
+        if (choice == 'r' || choice == 'R') {
+            raw_socket = restart_server(raw_socket);
+        } else {
+            printf("Exiting sniffer...\n");
+            return 1;
+        }
     }
 
     printf("Raw socket created successfully.\n");
@@ -56,20 +63,33 @@ int main() {
     unsigned char buffer[65536]; 
 
     while(1) {
-        int data_size = recv(raw_socket, buffer, sizeof(buffer),0);
+        int data_size = recvfrom(raw_socket, buffer, sizeof(buffer), 0, &saddr, &saddr_len);
+        
         if(data_size < 0) {
             perror("Recvfrom error");
-            // Recovery attempt: update the current socket with the newly created one
-            raw_socket = restart_server(raw_socket); 
-            // Check if the new socket was created successfully; if not, retry
-            if (raw_socket >= 0) {
-                printf("Socket restarted successfully. Resuming capture...\n");
+            
+            printf("Connection error. Do you want to restart the socket? (r = restart, e = exit): ");
+            scanf(" %c", &choice);
+            
+            if (choice == 'r' || choice == 'R') {
+                raw_socket = restart_server(raw_socket);
+                
+                if (raw_socket >= 0) {
+                    printf("Socket restarted successfully. Resuming capture...\n");
+                }
+                continue; 
+            } else {
+                printf("Closing server and exiting sniffer...\n");
+                break; // Exit the loop to terminate the program
             }
-            // Skip the rest of the loop and return to the start for a new read attempt
-            continue;
         }
+        
         printf("Received packet: %d bytes\n", data_size);
     }
-    close(raw_socket);
+
+    // Ensure the socket is properly closed before exiting
+    if (raw_socket >= 0) {
+        close(raw_socket);
+    }
     return 0;
 }
