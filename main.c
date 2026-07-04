@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <linux/if_packet.h>
 #include "create_socket.h"
+#include "frame_parse.h"
 
 /**
  * @brief Main function to run the packet sniffer.
@@ -35,6 +36,8 @@ int main() {
     struct sockaddr saddr;
     socklen_t saddr_len = sizeof(saddr);
 
+    unsigned int packet_counter =1;
+
     while(1) {
         int data_size = recvfrom(raw_socket, buffer, sizeof(buffer), 0, &saddr, &saddr_len);
         if(data_size < 0) {
@@ -43,7 +46,10 @@ int main() {
             return 1;
         }
 
-        printf("Received packet: %d bytes\n", data_size);
+        printf("\nPacket #%u\n", packet_counter);
+        packet_counter++;
+        
+        uint16_t eth_type = parse_ethertype(buffer);
     }
 
     close(raw_socket);
