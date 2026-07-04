@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <linux/if_packet.h>
 #include "create_socket.h"
+#include "frame_parse.h"
 
 /**
  * @brief Restarts the raw socket connection.
@@ -62,8 +63,10 @@ int main() {
     /** @brief Buffer to hold the incoming packet data (Max size: 65536 bytes) */
     unsigned char buffer[65536]; 
 
+    unsigned int packet_counter =1;
+
     while(1) {
-        int data_size = recvfrom(raw_socket, buffer, sizeof(buffer), 0, &saddr, &saddr_len);
+        int data_size = recv(raw_socket, buffer, sizeof(buffer), 0);
         
         if(data_size < 0) {
             perror("Recvfrom error");
@@ -83,8 +86,14 @@ int main() {
                 break; // Exit the loop to terminate the program
             }
         }
-        
-        printf("Received packet: %d bytes\n", data_size);
+
+        printf("\nPacket #%u\n", packet_counter);
+        packet_counter++;
+        int offset = 0; 
+        uint16_t eth_type = parse_ethertype(buffer,&offset);
+        if (eth_type == 0x0806) {
+            parse_arp(buffer, offset);
+        }
     }
 
     // Ensure the socket is properly closed before exiting
