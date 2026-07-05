@@ -25,7 +25,7 @@ uint8_t parse_ipv4(const unsigned char *buffer, int *offset){
    printf("Version: %u\n", version);
    printf("Length: %u bytes\n", header_length);
    printf("Total Length:" " %u bytes\n", ntohs(ip->total_length));
-   printf("Identification: 0x%04X\n", ntohs(ip->id));
+   printf("Identification: %u\n", ntohs(ip->id));
 
    uint16_t frag_offset_raw = ntohs(ip->frag_offset);
    uint8_t flags = (frag_offset_raw >> 13) & 0x07; // Extract the flags (first 3 bits)
