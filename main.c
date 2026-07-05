@@ -13,6 +13,10 @@
 #include <linux/if_packet.h>
 #include "create_socket.h"
 #include "frame_parse.h"
+#include "ipv4_parse.h"
+#include "transport_parse.h"
+#include "icmp_parse.h"
+#include "payload.h"
 
 /**
  * @brief Restarts the raw socket connection.
@@ -92,10 +96,29 @@ int main() {
         int offset = 0; 
         uint16_t eth_type = parse_ethertype(buffer,&offset);
         if (eth_type == 0x0806) {
-            parse_arp(buffer, offset);
-        }
-    }
+        parse_arp(buffer, offset);
+} 
+        else if (eth_type == 0x0800) {
+        uint8_t protocol = parse_ipv4(buffer, &offset);
+    
+        // Call the appropriate transport layer parser based on the protocol
+        if (protocol == 1) {             
+                parse_icmp(buffer, &offset); // call the ICMP parser
+            } else if (protocol == 6) {
+                parse_tcp(buffer, &offset);// call the TCP parser
+            } else if (protocol == 17) {
+                parse_udp(buffer, &offset);// call the UDP parser
+            }
 
+            // Print the payload if it exists
+            if (data_size > offset) {
+                print_payload(buffer + offset, data_size - offset);
+            } else {
+                printf("\nPayload: None\n");
+            }
+        }
+
+}
     // Ensure the socket is properly closed before exiting
     if (raw_socket >= 0) {
         close(raw_socket);
