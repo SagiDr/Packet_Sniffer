@@ -1,3 +1,4 @@
+#include "application_parse.h"
 #include "transport_parse.h"
 #include <stdio.h>
 #include <arpa/inet.h>
@@ -24,6 +25,9 @@ void parse_tcp(const unsigned char *buffer, int *offset) {
     printf("\n");
 
     printf("Window Size : %u\n", ntohs(tcp->window_size));
+
+    // Call the application layer parser with the source and destination ports
+    parse_application(ntohs(tcp->src_port), ntohs(tcp->dest_port));
 
     // Update the offset to point to the next protocol header after the TCP header
     uint8_t data_offset_bytes = (tcp->data_offset_res >> 4) * 4;
