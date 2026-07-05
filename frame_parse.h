@@ -17,7 +17,6 @@
     uint16_t ethertype; // Ethertype field,2bytes
  }__attribute__((packed));
 
- uint16_t parse_ethertype(const unsigned char *buffer);
  
 /** 
  * @brief Custom structure for VLAN (802.1Q) tag.
@@ -27,5 +26,25 @@ struct vlan_header {
     uint16_t tci;       // Tag Control Information (PCP - priority, DEI - if we can drop the packet, VID)
     uint16_t ethertype; // The actual encapsulated EtherType
 } __attribute__((packed));
+
+/** 
+ * @brief Custom structure for ARP header.
+ */
+struct arp_header {
+    uint16_t hw_type;   // Hardware Type
+    uint16_t proto_type;// Protocol Type
+    uint8_t  hw_len;    // Hardware Address Length
+    uint8_t  proto_len; // Protocol Address Length
+    uint16_t opcode;    // Operation Code (Request/Reply)
+    uint8_t  sender_mac[MAC_ADDR_LEN]; // Sender MAC Address
+    uint8_t  sender_ip[4];             // Sender IP Address
+    uint8_t  target_mac[MAC_ADDR_LEN]; // Target MAC Address
+    uint8_t  target_ip[4];             // Target IP Address
+} __attribute__((packed));
+
+//updated function signature to include offset parameter
+uint16_t parse_ethertype(const unsigned char *buffer, int *offset);
+
+void parse_arp(const unsigned char *buffer, int offset);
 
 #endif
