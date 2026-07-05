@@ -10,7 +10,7 @@ uint16_t parse_ethertype(const unsigned char *buffer, int *offset){
     printf("Protocol:Ethernet II\n");
 
 
-    printf("Destiontion Mac address: %02X:%02X:%02X:%02X:%02X:%02X\n",
+    printf("Destination Mac address: %02X:%02X:%02X:%02X:%02X:%02X\n",
         eth_header->dest_mac[0],eth_header->dest_mac[1],
         eth_header->dest_mac[2],eth_header->dest_mac[3],
         eth_header->dest_mac[4],eth_header->dest_mac[5]);

@@ -1,5 +1,5 @@
-#ifndef NETWORK_PARSE_H
-#define NETWORK_PARSE_H
+#ifndef IPV4_PARSE_H
+#define IPV4_PARSE_H
 
 #include <stdint.h>
 

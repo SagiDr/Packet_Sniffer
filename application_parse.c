@@ -22,8 +22,13 @@ void parse_application(uint16_t src_port, uint16_t dest_port, const unsigned cha
             char uri[256] = {0};
             char version[16] = {0};
             
-            // Extract the first three words (Method, URI, Version) from the payload
-            if (sscanf((const char *)payload, "%15s %255s %15s", method, uri, version) == 3) {
+            // Ensure we don't read beyond the payload length to avoid buffer overflows
+            int safe_len = payload_length < 500 ? payload_length : 499;
+            char safe_payload[500] = {0};
+            memcpy(safe_payload, payload, safe_len);
+
+            // Extract the first three words (Method, URI, Version) from the payload 
+            if (sscanf(safe_payload, "%15s %255s %15s", method, uri, version) == 3) {
                 
                 // Validate that the extracted strings represent a valid HTTP request or response
                 if (strncmp(method, "GET", 3) == 0 || strncmp(method, "POST", 4) == 0 || strncmp(method, "HTTP", 4) == 0) {

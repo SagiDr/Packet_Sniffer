@@ -3,7 +3,7 @@
 #include <arpa/inet.h>
 
 uint8_t parse_ipv4(const unsigned char *buffer, int *offset){
-    //posion the pointer to the start of the IPv4 header based on the current offset    
+    //position the pointer to the start of the IPv4 header based on the current offset    
     const struct ipv4_header *ip = (const struct ipv4_header *)(buffer + *offset);
 
    printf("\nLayer3: Network\n");
