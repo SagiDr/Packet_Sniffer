@@ -105,9 +105,9 @@ int main() {
         if (protocol == 1) {             
                 parse_icmp(buffer, &offset); // call the ICMP parser
             } else if (protocol == 6) {
-                parse_tcp(buffer, &offset);// call the TCP parser
+                parse_tcp(buffer, &offset, data_size);// call the TCP parser
             } else if (protocol == 17) {
-                parse_udp(buffer, &offset);// call the UDP parser
+                parse_udp(buffer, &offset, data_size);// call the UDP parser
             }
 
             // Print the payload if it exists

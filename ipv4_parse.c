@@ -6,13 +6,21 @@ uint8_t parse_ipv4(const unsigned char *buffer, int *offset){
     //posion the pointer to the start of the IPv4 header based on the current offset    
     const struct ipv4_header *ip = (const struct ipv4_header *)(buffer + *offset);
 
-    printf("\nLayer3: Network\n");
-    printf("Protocol: IPv4\n");
+   printf("\nLayer3: Network\n");
+   printf("Protocol: IPv4\n");
 
-    uint8_t version = (ip->version_ihl >> 4) & 0x0F; // Extract the version (first 4 bits)
-    uint8_t ihl = ip->version_ihl & 0x0F;
-
+   uint8_t version = (ip->version_ihl >> 4) & 0x0F; // Extract the version (first 4 bits)
+   uint8_t ihl = ip->version_ihl & 0x0F;
    uint16_t header_length = ihl * 4;
+
+   // Check for invalid version or header length
+   if (version != 4) {
+        printf("Error: Invalid IPv4 version (%u). Expected version 4!\n", version);
+    }
+    if (ihl < 5) {
+        printf("Error: IPv4 header is too short (%u bytes). Missing fields!\n", header_length);
+    }
+
 
    printf("Version: %u\n", version);
    printf("Length: %u bytes\n", header_length);
@@ -44,8 +52,7 @@ uint8_t parse_ipv4(const unsigned char *buffer, int *offset){
     }
 
     uint8_t protocol = ip->protocol; // Store the protocol for return
-    *offset += (ip->version_ihl & 0x0F) * 4;// Update the offset to point to the next protocol header after the ipv4 header
+    *offset += header_length;// Update the offset to point to the next protocol header after the ipv4 header
     
     return protocol; //return the protocol for further processing in main.c
-
 }

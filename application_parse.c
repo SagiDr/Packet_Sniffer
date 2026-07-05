@@ -1,7 +1,13 @@
+/**
+ * @file application_parse.c
+ * @brief Implementation of Application Layer parsing.
+ */
+
 #include "application_parse.h"
 #include <stdio.h>
+#include <string.h>
 
-void parse_application(uint16_t src_port, uint16_t dest_port) {
+void parse_application(uint16_t src_port, uint16_t dest_port, const unsigned char *payload, int payload_length) {
     printf("\nLayer 5-7\n");
     printf("---------\n");
     printf("Protocol : ");
@@ -9,6 +15,24 @@ void parse_application(uint16_t src_port, uint16_t dest_port) {
     // Identify application layer protocol based on common port numbers
     if (src_port == 80 || dest_port == 80) {
         printf("HTTP\n");
+        
+        // see if  there is a payload to parse
+        if (payload_length > 0) {
+            char method[16] = {0};
+            char uri[256] = {0};
+            char version[16] = {0};
+            
+            // Extract the first three words (Method, URI, Version) from the payload
+            if (sscanf((const char *)payload, "%15s %255s %15s", method, uri, version) == 3) {
+                
+                // Validate that the extracted strings represent a valid HTTP request or response
+                if (strncmp(method, "GET", 3) == 0 || strncmp(method, "POST", 4) == 0 || strncmp(method, "HTTP", 4) == 0) {
+                    printf("Method: %s\n", method);
+                    printf("URI: %s\n", uri);
+                    printf("Version: %s\n", version);
+                }
+            }
+        }
     } else if (src_port == 443 || dest_port == 443) {
         printf("HTTPS\n");
     } else if (src_port == 53 || dest_port == 53) {

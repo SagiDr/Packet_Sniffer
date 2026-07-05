@@ -35,13 +35,12 @@ struct udp_header {
  * @param buffer Pointer to the raw packet data.
  * @param offset The starting position of the TCP header in the buffer.
  */
-void parse_tcp(const unsigned char *buffer, int *offset);
-
+void parse_tcp(const unsigned char *buffer, int *offset, int data_size);
 /**
  * @brief Parses the UDP header from the buffer.
  * @param buffer Pointer to the raw packet data.
  * @param offset The starting position of the UDP header in the buffer.
  */
-void parse_udp(const unsigned char *buffer, int *offset);
+void parse_udp(const unsigned char *buffer, int *offset, int data_size);
 
 #endif
