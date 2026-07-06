@@ -18,13 +18,13 @@ void parse_application(uint16_t src_port, uint16_t dest_port, const unsigned cha
         
         // see if  there is a payload to parse
         if (payload_length > 0) {
-            char method[16] = {0};
-            char uri[256] = {0};
-            char version[16] = {0};
+            char method[16] = {0};// Buffer to hold the HTTP method, ensuring it doesn't exceed 15 characters
+            char uri[256] = {0};// Buffer to hold the URI, ensuring it doesn't exceed 255 characters
+            char version[16] = {0};// Buffer to hold the HTTP version, ensuring it doesn't exceed 15 characters
             
             // Ensure we don't read beyond the payload length to avoid buffer overflows
             int safe_len = payload_length < 500 ? payload_length : 499;
-            char safe_payload[500] = {0};
+            char safe_payload[500] = {0};// Temporary buffer to safely hold the payload for parsing, ensuring null-termination
             memcpy(safe_payload, payload, safe_len);
 
             // Extract the first three words (Method, URI, Version) from the payload 

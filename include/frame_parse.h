@@ -15,16 +15,16 @@
     uint8_t dest_mac[MAC_ADDR_LEN]; // Destination MAC address,1byte(only needs 6)
     uint8_t src_mac[MAC_ADDR_LEN];  // Source MAC address,1byte(only needs 6)
     uint16_t ethertype; // Ethertype field,2bytes
- }__attribute__((packed));
+ }__attribute__((packed));//
 
  
 /** 
- * @brief Custom structure for VLAN (802.1Q) tag.
- * Follows immediately after the src_mac in Ethernet II if EtherType is 0x8100.
+ * @brief Custom structure for VLAN tag.
+ * Follows immediately after the src_mac in Ethernet II if ethertype is 0x8100.
  */
 struct vlan_header {
-    uint16_t tci;       // Tag Control Information (PCP - priority, DEI - if we can drop the packet, VID)
-    uint16_t ethertype; // The actual encapsulated EtherType
+    uint16_t tci;       // Tag Control Information (PCP - priority, DEI - if we can drop the packet, VID - VLAN ID)
+    uint16_t ethertype; // The actual encapsulated ethertype after the VLAN tag
 } __attribute__((packed));
 
 /** 
