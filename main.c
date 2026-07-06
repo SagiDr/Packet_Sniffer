@@ -69,11 +69,12 @@ int main() {
 
     unsigned int packet_counter =1;
 
+    // Infinite loop to continuously receive packets
     while(1) {
         int data_size = recv(raw_socket, buffer, sizeof(buffer), 0);
         
         if(data_size < 0) {
-            perror("Recvfrom error");
+            perror("Recv error");
             
             printf("Connection error. Do you want to restart the socket? (r = restart, e = exit): ");
             scanf(" %c", &choice);
